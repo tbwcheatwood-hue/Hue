@@ -175,6 +175,95 @@ def test_launch_command_is_bare_binary() -> None:
     assert cursor.input_markers == ("→",)
 
 
+def test_kilo_code_and_z_code_are_registered() -> None:
+    """The new coding agents are registered alongside Cursor, not replacing it."""
+    kilo = get_agent("kilo-code")
+    assert kilo is not None
+    assert kilo.display_name == "Kilo Code"
+    assert kilo.executable == "kilo-code"
+    assert kilo.launch_command == "kilo-code"
+    assert kilo.needs_trust is False
+    assert kilo.account is None
+    assert kilo.file_reference == "at"
+    assert kilo.input_markers == ("→",)
+    assert kilo.spawn_env_factory is not None
+
+    z = get_agent("z-code")
+    assert z is not None
+    assert z.display_name == "Zed Code"
+    assert z.executable == "z-code"
+    assert z.launch_command == "z-code"
+    assert z.needs_trust is False
+    assert z.account is None
+    assert z.file_reference == "at"
+    assert z.input_markers == ("→",)
+    assert z.spawn_env_factory is not None
+
+
+def test_kilo_code_and_z_code_degrade_when_unconfigured() -> None:
+    """Without an API key the spawn env factory returns None — safe default,
+    never a half-set environment that would talk to the wrong vendor."""
+    from jarvis.workspace.agents import (
+        kilo_code_spawn_env,
+        z_code_spawn_env,
+    )
+
+    assert kilo_code_spawn_env() is None
+    assert z_code_spawn_env() is None
+
+
+def test_cursor_is_unchanged_after_adding_kilo_and_z_code() -> None:
+    """Cursor still resolves, launches, and detects exactly as before."""
+    cursor = get_agent("cursor")
+    assert cursor is not None
+    assert cursor.display_name == "Cursor CLI"
+    assert cursor.executable == "agent"
+    assert cursor.launch_command == "agent"
+    assert cursor.binary_aliases == ("cursor-agent",)
+    assert cursor.needs_trust is False
+    assert cursor.account is None
+    assert cursor.input_markers == ("→",)
+    assert cursor.spawn_env_factory is None
+
+
+def test_kilo_code_and_z_code_are_reversible() -> None:
+    """Removing the two entries restores the registry to exactly its prior
+    contents — no leftover state, no data migration needed."""
+    from jarvis.workspace import agents as registry
+
+    kilo = registry.get_agent("kilo-code")
+    z = registry.get_agent("z-code")
+    assert kilo is not None and z is not None
+
+    try:
+        registry._AGENTS.pop("kilo-code", None)
+        registry._AGENTS.pop("z-code", None)
+        registry.invalidate_agent_detection()
+
+        assert registry.get_agent("kilo-code") is None
+        assert registry.get_agent("z-code") is None
+        assert registry.get_agent("cursor") is not None
+        # Cursor still works exactly as before.
+        cursor = registry.get_agent("cursor")
+        assert cursor.display_name == "Cursor CLI"
+        assert cursor.launch_command == "agent"
+    finally:
+        # Restore for any other tests that import the full registry.
+        if kilo is not None:
+            registry._AGENTS["kilo-code"] = kilo
+        if z is not None:
+            registry._AGENTS["z-code"] = z
+        registry.invalidate_agent_detection()
+
+
+def test_required_coding_agents_still_include_cursor() -> None:
+    """The required set superset still contains Cursor alongside the new entries."""
+    names = set(coding_agent_names())
+    assert "cursor" in names
+    assert "kilo-code" in names
+    assert "z-code" in names
+
+
 def test_build_agent_argv_wraps_command_in_a_shell() -> None:
     argv = build_agent_argv("claude")
     assert argv is not None

@@ -33,7 +33,7 @@
     "allow_sapi5_fallback": false
   },
   "brain": {
-    "primary": "openai",
+    "primary": "gemini",
     "fallback": "openrouter",
     "deep_brain": "claude-cli",
     "routing_provider": "grok",
@@ -113,7 +113,7 @@
     "provider": "vertex"
   },
   "brain.computer_use": {
-    "provider": "openai"
+    "provider": "gemini"
   },
   "brain.providers.grok-realtime": {
     "voice": "lux"

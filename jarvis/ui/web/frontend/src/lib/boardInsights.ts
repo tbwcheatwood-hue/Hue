@@ -187,6 +187,8 @@ const AGENT_LABELS: Record<string, string> = {
   "kimi-cli": "Kimi CLI",
   "glm-cli": "GLM CLI",
   "cursor-cli": "Cursor CLI",
+  "kilo-code-cli": "Kilo Code",
+  "z-code-cli": "Zed Code",
 };
 
 export function agentLabel(id: string): string {

@@ -33,7 +33,7 @@ from jarvis.core.process_utils import NO_WINDOW_CREATIONFLAGS
 
 _VERSION_TIMEOUT_S = 8.0
 
-AgentCliName = Literal["claude", "codex", "antigravity", "grok-build"]
+AgentCliName = Literal["claude", "codex", "antigravity", "grok-build", "kilo-code", "z-code"]
 
 
 @dataclass(frozen=True)
@@ -245,6 +245,108 @@ def test_grok_build() -> AgentCliTestResult:
     )
 
 
+def test_kilo_code() -> AgentCliTestResult:
+    """Probe the Kilo Code binary.
+
+    The binary name ``kilo-code`` is a placeholder that must be confirmed
+    against a live install. No auth service exists for this product yet, so
+    the probe only checks that the binary is present and answers ``--version``.
+    """
+    from jarvis.agent_chat.runner_cli import CLI_BINARIES, _which
+
+    t0 = time.monotonic()
+    ensure_cli_paths()
+    binary = _which(*CLI_BINARIES["kilo-code-cli"])
+    if binary is None:
+        return _not_installed(
+            "kilo-code",
+            "Install the Kilo Code CLI and make sure ``kilo-code`` is on PATH.",
+            t0,
+        )
+    version = _live_version([binary])
+    if version is None:
+        return AgentCliTestResult(
+            cli="kilo-code",
+            ok=False,
+            installed=True,
+            binary_path=binary,
+            version=None,
+            connected=False,
+            auth_mode="unknown",
+            account=None,
+            message=(
+                f"Found Kilo Code at {binary}, but '--version' did not answer "
+                "— the install looks broken."
+            ),
+            searched_path=_searched_path_dirs(),
+            duration_ms=int((time.monotonic() - t0) * 1000),
+        )
+    return AgentCliTestResult(
+        cli="kilo-code",
+        ok=True,
+        installed=True,
+        binary_path=binary,
+        version=version,
+        connected=False,
+        auth_mode="unknown",
+        account=None,
+        message=f"Kilo Code answered at {binary}.",
+        searched_path=_searched_path_dirs(),
+        duration_ms=int((time.monotonic() - t0) * 1000),
+    )
+
+
+def test_z_code() -> AgentCliTestResult:
+    """Probe the Z Code binary.
+
+    The binary name ``z-code`` is a placeholder that must be confirmed
+    against a live install. No auth service exists for this product yet, so
+    the probe only checks that the binary is present and answers ``--version``.
+    """
+    from jarvis.agent_chat.runner_cli import CLI_BINARIES, _which
+
+    t0 = time.monotonic()
+    ensure_cli_paths()
+    binary = _which(*CLI_BINARIES["z-code-cli"])
+    if binary is None:
+        return _not_installed(
+            "z-code",
+            "Install the Z Code CLI and make sure ``z-code`` is on PATH.",
+            t0,
+        )
+    version = _live_version([binary])
+    if version is None:
+        return AgentCliTestResult(
+            cli="z-code",
+            ok=False,
+            installed=True,
+            binary_path=binary,
+            version=None,
+            connected=False,
+            auth_mode="unknown",
+            account=None,
+            message=(
+                f"Found Z Code at {binary}, but '--version' did not answer "
+                "— the install looks broken."
+            ),
+            searched_path=_searched_path_dirs(),
+            duration_ms=int((time.monotonic() - t0) * 1000),
+        )
+    return AgentCliTestResult(
+        cli="z-code",
+        ok=True,
+        installed=True,
+        binary_path=binary,
+        version=version,
+        connected=False,
+        auth_mode="unknown",
+        account=None,
+        message=f"Z Code answered at {binary}.",
+        searched_path=_searched_path_dirs(),
+        duration_ms=int((time.monotonic() - t0) * 1000),
+    )
+
+
 __all__ = [
     "AgentCliName",
     "AgentCliTestResult",
@@ -252,4 +354,6 @@ __all__ = [
     "test_claude",
     "test_codex",
     "test_grok_build",
+    "test_kilo_code",
+    "test_z_code",
 ]

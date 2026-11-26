@@ -70,8 +70,8 @@ files they wrote remain.
 
 Chat mode's provider picker lists the same coding CLIs the pane step does —
 Claude Code, Codex, OpenCode, Kimi Code, GLM Coding Plan, Grok Build,
-Antigravity and DeepSeek Harness — under **Coding CLIs**, each with the
-models, effort levels and permission modes that CLI actually takes. Every one
+Antigravity, DeepSeek Harness, Kilo Code and Zed Code — under **Coding CLIs**,
+each with the models, effort levels and permission modes that CLI actually takes. Every one
 of them answers in the chat itself: the reply, the model's reasoning where the
 CLI shares it, and each tool call with its result appear as rows in the
 conversation, never as a terminal. A CLI that keeps its own login (OpenCode,
@@ -129,7 +129,7 @@ shows a small reminder of the chord.
 | Keys after Ctrl+B | What happens |
 | --- | --- |
 | Agent letter, then an arrow | Open that agent beside the focused pane, in the arrow's direction. Enter puts it in the even grid instead. |
-| `C` · `X` · `O` · `K` · `L` · `G` · `A` · `U` | Claude Code · Codex · OpenCode · Kimi Code · GLM · Grok Build · Antigravity · Cursor CLI (only installed ones are listed) |
+| `C` · `X` · `O` · `K` · `L` · `G` · `A` · `U` · `J` · `Y` | Claude Code · Codex · OpenCode · Kimi Code · GLM · Grok Build · Antigravity · Cursor CLI · Kilo Code · Zed Code (only installed ones are listed) |
 | `V` · `-` | Split the focused pane right · below, with the same agent |
 | `+` | Open the full Add coding agent dialog |
 | Arrows / Shift+arrows | Focus the neighboring pane / swap with it |

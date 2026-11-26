@@ -137,6 +137,12 @@ CLI_BINARIES: Final[dict[str, tuple[str, ...]]] = {
         "agent.exe",
         "agent.cmd",
     ),
+    # Kilo Code and Z Code are not referenced anywhere in the repo or its docs.
+    # The binary names below are PLACEHOLDERS that must be confirmed against a
+    # live install before either CLI will resolve. Until then the entry reports
+    # "not installed" and no pane of it can start — which is the safe default.
+    "kilo-code-cli": ("kilo-code", "kilo-code.exe"),
+    "z-code-cli": ("z-code", "z-code.exe"),
 }
 
 
@@ -291,6 +297,32 @@ def cursor_argv_prefix() -> list[str]:
     binary = resolve_cursor_binary()
     if not binary:
         raise CliUnavailable("Cursor CLI (agent) is not installed or not on PATH.")
+    return [binary]
+
+
+def kilo_argv_prefix() -> list[str]:
+    """Resolve the Kilo Code binary from PATH.
+
+    The binary name ``kilo-code`` is a placeholder that must be confirmed
+    against a live install. Until the real name is known, this resolves to
+    nothing and the runner reports the CLI as missing.
+    """
+    binary = _which(*CLI_BINARIES["kilo-code-cli"])
+    if not binary:
+        raise CliUnavailable("Kilo Code (kilo-code) is not installed or not on PATH.")
+    return [binary]
+
+
+def z_argv_prefix() -> list[str]:
+    """Resolve the Z Code binary from PATH.
+
+    The binary name ``z-code`` is a placeholder that must be confirmed
+    against a live install. Until the real name is known, this resolves to
+    nothing and the runner reports the CLI as missing.
+    """
+    binary = _which(*CLI_BINARIES["z-code-cli"])
+    if not binary:
+        raise CliUnavailable("Z Code (z-code) is not installed or not on PATH.")
     return [binary]
 
 
@@ -1407,6 +1439,61 @@ def plan_cursor(
     return CliPlan(argv, env, None, "cursor", resume)
 
 
+def plan_kilo(
+    *,
+    prompt: str,
+    cwd: Path,
+    model: str,
+    effort: str,
+    permission_mode: str,
+    resume: str | None,
+    identity: jarvis_harness.Identity | None = None,
+) -> CliPlan:
+    """Kilo Code runner — placeholder pending vendor confirmation.
+
+    The CLI's flags, output wire format and resume behaviour are not yet
+    known, so this runs the binary in plain-text mode (shape ``"text"``) with
+    the prompt as the final argv entry. No model, effort or resume flags are
+    sent because none are confirmed for this product. The binary name itself
+    is a placeholder and must be confirmed against a live install.
+
+    Reversible: removing the ``"kilo-code"`` entry from the registry in
+    ``jarvis/workspace/agents.py`` and these two functions from this module
+    restores prior behaviour exactly.
+    """
+    del cwd, effort, resume  # Not yet confirmed for this product.
+    normalize_permission("kilo-code-cli", permission_mode)
+    prompt = _with_identity(prompt, identity, None, compact=True)
+    prefix = kilo_argv_prefix()
+    argv = [*prefix, _argv_prompt(prefix, prompt)]
+    env = _registry_env("kilo-code", _account_env("kilo-code"))
+    return CliPlan(argv, env, None, "text", None)
+
+
+def plan_z(
+    *,
+    prompt: str,
+    cwd: Path,
+    model: str,
+    effort: str,
+    permission_mode: str,
+    resume: str | None,
+    identity: jarvis_harness.Identity | None = None,
+) -> CliPlan:
+    """Z Code runner — placeholder pending vendor confirmation.
+
+    Mirrors plan_kilo: plain-text mode, no confirmed flags, placeholder binary
+    name. Reversible in the same way.
+    """
+    del cwd, effort, resume  # Not yet confirmed for this product.
+    normalize_permission("z-code-cli", permission_mode)
+    prompt = _with_identity(prompt, identity, None, compact=True)
+    prefix = z_argv_prefix()
+    argv = [*prefix, _argv_prompt(prefix, prompt)]
+    env = _registry_env("z-code", _account_env("z-code"))
+    return CliPlan(argv, env, None, "text", None)
+
+
 def _with_identity(
     prompt: str,
     identity: jarvis_harness.Identity | None,
@@ -1470,6 +1557,8 @@ _PLANNERS: Final[dict[str, Any]] = {
     "glm-cli": plan_glm,
     "dsh-cli": plan_dsh,
     "cursor-cli": plan_cursor,
+    "kilo-code-cli": plan_kilo,
+    "z-code-cli": plan_z,
 }
 
 #: Every runner this module drives — the catalog route's "is this a CLI
